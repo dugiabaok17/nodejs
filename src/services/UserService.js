@@ -11,8 +11,8 @@ let handleUserLogin = (email, password) => {
         //Compare password
         let user = await db.User.findOne({
           where: { email: email },
-          attributes: ['email','password','roleId'],
-          raw: true
+          attributes: ["email", "password", "roleId"],
+          raw: true,
         });
 
         if (user) {
@@ -20,8 +20,8 @@ let handleUserLogin = (email, password) => {
           if (check) {
             userData.errCode = 0;
             userData.errMessage = "Ok";
-            console.log(user)
-            delete user.password
+            console.log(user);
+            delete user.password;
             userData.user = user;
           } else {
             userData.errCode = 3;
@@ -61,9 +61,30 @@ let checkUserEmail = (email) => {
   });
 };
 
-let compareUserPassword = (password) => {
-  return new Promise((resolve, reject) => {
+let getAllUsers = (userId) => {
+  return new Promise(async (resolve, reject) => {
     try {
+      let users = "";
+      if (userId === "ALL") {
+        console.log("hi");
+        users = await db.User.findAll({
+          attributes: {
+            exclude: 'password'
+          }
+        });
+      }
+      if (userId && userId !== "ALL") {
+        console.log("hello");
+
+        users = await db.User.findOne({
+          where: { id: userId },
+          attributes: {
+            exclude: 'password'
+          }
+        });
+      }
+
+      resolve(users);
     } catch (error) {
       reject(error);
     }
@@ -71,4 +92,5 @@ let compareUserPassword = (password) => {
 };
 module.exports = {
   handleUserLogin,
+  getAllUsers,
 };
